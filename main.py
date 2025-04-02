@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import boto3
 import datetime
 from botocore.signers import CloudFrontSigner
@@ -17,15 +17,25 @@ s3_client = boto3.client(
     aws_secret_access_key=aws_secret_key
 )
 
-@app.route('/generate-url')
+@app.route('/generate-url', methods=['GET'])
 def generate_url():
-    # Génération de l'URL pré-signée
-    url = s3_client.generate_presigned_url(
-        'get_object',
-        Params={'Bucket': 'muslim.vibes', 'Key': 'message.mp4'},
-        ExpiresIn=3600  # Durée de validité (en secondes)
-    )
-    return jsonify({'url': url})
+    # Récupérer le paramètre 'video' depuis l'URL
+    video_key = request.args.get('video')
+    
+    if not video_key:
+        return jsonify({"error": "Missing 'video' parameter"}), 400
+    
+    # Générer l'URL pré-signée pour le fichier spécifié
+    try:
+        url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': 'muslim.vibes', 'Key': video_key},
+            ExpiresIn=3600  # Durée de validité (en secondes)
+        )
+        return jsonify({'url': url})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
