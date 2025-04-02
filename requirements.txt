@@ -1,3 +1,4 @@
 fastapi
 uvicorn
-boto3
+boto3==1.35.90
+flask==2.1.2
