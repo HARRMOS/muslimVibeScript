@@ -1,4 +1,4 @@
 gunicorn==20.1.0
 flask==2.1.2
 werkzeug==2.1.2
-python-swiftclient==3.14.1
+python-swiftclient==3.13.1
